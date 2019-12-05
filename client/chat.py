@@ -18,6 +18,8 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         self.setupUi(self)
         self.setWindowOpacity(1)
         self.networkInit()
+        self.sendButton.clicked.connect(self.send)
+        self.exitButton.clicked.connect(self.logout)
         self.userTableWidget.horizontalHeader().setSectionResizeMode(
             QtWidgets.QHeaderView.Stretch)
         self.splitter.setStretchFactor(0, 7)
@@ -47,6 +49,10 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         except:
             pass
         if type == "Message":
+            if username == self.username:
+                self.messageBrowser.setAlignment(Qt.AlignRight)
+            else:
+                self.messageBrowser.setAlignment(Qt.AlignLeft)
             self.messageBrowser.setTextColor(Qt.blue)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
@@ -176,15 +182,6 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                     #     self.scrollRecords.verticalScrollBar().maximum())
             time.sleep(0.1)
 
-    def logout(self, event):
-        reply = QtWidgets.QMessageBox.warning(self, u"logout", u"Are you sure to logout?",
-                                              QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-        if reply == QtWidgets.QMessageBox.Yes:
-            self.disconnect_server()
-            # event.accept()
-        else:
-            event.ignore()
-
     def connect_server(self, name, IP, port):
         try:
             self.conn.connect((IP, port))
@@ -216,6 +213,8 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         self.conn = socket.socket()
 
     def getMessage(self):
+        # add enter
+        self.messageTextEdit.append("")
         msg = self.messageTextEdit.toHtml()
         self.messageTextEdit.clear()
         self.messageTextEdit.setFocus()
@@ -326,15 +325,17 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
 
         self.messageBrowser.clear()
 
-    @pyqtSlot()
-    def on_sendButton_clicked(self):
+    # @pyqtSlot()
+    def send(self):
 
         self.send_message()
 
-    @pyqtSlot()
-    def on_exitButton_clicked(self):
-        self.disconnect_server()
-        self.close()
+    def logout(self):
+        reply = QtWidgets.QMessageBox.warning(self, u"logout", u"Are you sure to logout?",
+                                              QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+        if reply == QtWidgets.QMessageBox.Yes:
+            self.disconnect_server()
+            self.close()
 
     def closeEvent(self, event):
         reply = QtWidgets.QMessageBox.question(self, u"shutdown", u"Are you sure to leave?",
@@ -344,6 +345,18 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             event.accept()
         else:
             event.ignore()
+
+    # keyboard events
+    def keyPressEvent(self, event):
+        # event.key（）display the code
+        # print("press: " + str(event.key()))
+        if (event.key() == Qt.Key_Escape):
+            self.logout()
+        if (event.key() + 1 == Qt.Key_Enter):
+            if QApplication.keyboardModifiers() == Qt.ControlModifier:
+                self.send()
+            else:
+                print("enter")
 
 
 userlists = []

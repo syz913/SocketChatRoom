@@ -1,0 +1,15 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource>
+        <file alias="image/bg1.jpg">image/bg1.jpg</file>
+        <file alias="image/bg2.jpg">image/bg2.jpg</file>
+        <file alias="image/sky.jpg">image/sky.jpg</file>
+        <file alias="image/bold.png">image/bold.png</file>
+        <file alias="image/clear.png">image/clear.png</file>
+        <file alias="image/color.png">image/color.png</file>
+        <file alias="image/italic.png">image/italic.png</file>
+        <file alias="image/save.png">image/save.png</file>
+        <file alias="image/send.png">image/send.png</file>
+        <file alias="image/under.png">image/under.png</file>
+    </qresource>
+</RCC>

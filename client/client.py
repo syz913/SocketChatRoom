@@ -45,6 +45,7 @@ class ClientWidget(QtWidgets.QWidget):
 
         self.connStatus = QtWidgets.QLabel("", self)
         self.connBtn = QtWidgets.QPushButton("Log in")
+        self.connBtn.setShortcut(QtCore.Qt.Key_Return)
         self.connBtn.clicked.connect(self.connect_server)
         LoginGrid.addWidget(self.LoginBox, 0, 0, 2, 2)
 

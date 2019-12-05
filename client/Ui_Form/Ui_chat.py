@@ -1,15 +1,16 @@
-import Ui_Form.image_rc
+import Ui_Form.images_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_chat(object):
     def setupUi(self, Widget):
         Widget.setObjectName("Widget")
-        Widget.resize(1000, 600)
-        # palette = QtGui.QPalette()
-        # palette.setBrush(Widget.backgroundRole, QtGui.QBrush(QtGui.QPixmap(".\images\bg1.jpg")))  
-        # Widget.setPalette(palette)
-        # Widget.setAutoFillBackground(True) 
+        Widget.resize(900, 800)
+
+        palette = QtGui.QPalette()
+        palette.setBrush(QtGui.QPalette.Background, QtGui.QBrush(QtGui.QPixmap(":/image/sky.jpg")))  
+        Widget.setPalette(palette)
+        Widget.setAutoFillBackground(True) 
 
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(Widget)
         self.verticalLayout_3.setContentsMargins(11, 11, 11, 11)
@@ -36,13 +37,14 @@ class Ui_chat(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.messageBrowser = QtWidgets.QTextBrowser(self.layoutWidget)
         self.messageBrowser.setObjectName("messageBrowser")
+        self.messageBrowser.setStyleSheet('background-image:url(:/image/bg1.jpg)')
         self.verticalLayout.addWidget(self.messageBrowser)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setSpacing(6)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
 
-        self.sendChoice = QtWidgets.QLabel("Send to: ", self)
-        self.horizontalLayout_2.addWidget(self.sendChoice)
+        # self.sendChoice = QtWidgets.QLabel("Send to: ", self)
+        # self.horizontalLayout_2.addWidget(self.sendChoice)
         self.SizeComboBox1 = QtWidgets.QComboBox(self.layoutWidget)
         self.SizeComboBox1.setObjectName("SizeComboBox1")
         self.SizeComboBox1.addItem("ALL")
@@ -137,6 +139,7 @@ class Ui_chat(object):
             QtWidgets.QAbstractItemView.SelectRows)
         self.userTableWidget.setShowGrid(False)
         self.userTableWidget.setObjectName("userTableWidget")
+        self.userTableWidget.setStyleSheet('background-image:url(:/image/bg2.jpg)')
         self.userTableWidget.setColumnCount(1)
         self.userTableWidget.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
@@ -149,7 +152,6 @@ class Ui_chat(object):
             108, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.sendButton = QtWidgets.QPushButton(Widget)
-        self.sendButton.setObjectName("sendButton")
         self.horizontalLayout.addWidget(self.sendButton)
         spacerItem1 = QtWidgets.QSpacerItem(
             178, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -203,10 +205,12 @@ class Ui_chat(object):
         self.clearToolBtn.setToolTip(_translate("Widget", "清空聊天记录"))
         self.clearToolBtn.setText(_translate("Widget", "..."))
         item = self.userTableWidget.horizontalHeaderItem(0)
-        item.setText(_translate("Widget", "UserName"))
+        item.setText(_translate("Widget", "USERS"))
         self.sendButton.setText(_translate("Widget", "Send"))
+        self.sendButton.setToolTip(_translate("Widget", "CTRL+ENTER"))
         self.userNumLabel.setText(_translate("Widget", "Online users: 0"))
         self.exitButton.setText(_translate("Widget", "Quit"))
+        self.exitButton.setToolTip(_translate("Widget", "ESC"))
 
 
 if __name__ == "__main__":
