@@ -37,7 +37,9 @@ class Ui_chat(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.messageBrowser = QtWidgets.QTextBrowser(self.layoutWidget)
         self.messageBrowser.setObjectName("messageBrowser")
-        self.messageBrowser.setStyleSheet('background-image:url(:/image/bg1.jpg)')
+        self.messageBrowser.setStyleSheet( 
+            "background-color:rgb(255,255,255);border-radius:8px;padding:10px;\n"
+            "background-image:url(:/image/bg1.jpg)")
         self.verticalLayout.addWidget(self.messageBrowser)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setSpacing(6)
@@ -132,13 +134,22 @@ class Ui_chat(object):
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.messageTextEdit = QtWidgets.QTextEdit(self.splitter)
         self.messageTextEdit.setObjectName("messageTextEdit")
+        self.messageTextEdit.setStyleSheet(
+            "background-color:rgb(255,255,255);border-radius:8px;\n"
+            "margin:0px 10px 0px 10px"
+        )
         self.userTableWidget = QtWidgets.QTableWidget(self.splitter_2)
+        # hide the number
+        self.userTableWidget.verticalHeader().setHidden(True)
         self.userTableWidget.setSelectionMode(
             QtWidgets.QAbstractItemView.SingleSelection)
         self.userTableWidget.setSelectionBehavior(
             QtWidgets.QAbstractItemView.SelectRows)
-        self.userTableWidget.setShowGrid(False)
+        self.userTableWidget.setShowGrid(True)
         self.userTableWidget.setObjectName("userTableWidget")
+        self.userTableWidget.horizontalHeader().setStyleSheet(
+            "font-size:30px;font-family:华文琥珀;"
+        )
         self.userTableWidget.setStyleSheet('background-image:url(:/image/bg2.jpg)')
         self.userTableWidget.setColumnCount(1)
         self.userTableWidget.setRowCount(0)
@@ -151,7 +162,14 @@ class Ui_chat(object):
         spacerItem = QtWidgets.QSpacerItem(
             108, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
+        op = QtWidgets.QGraphicsOpacityEffect()
+        op.setOpacity(0.8)
         self.sendButton = QtWidgets.QPushButton(Widget)
+        self.sendButton.setStyleSheet(
+            "QPushButton{background-color:rgb(255,255,255);border: 0px solid black;border-radius:8px;padding:10px 30px 10px 30px}"
+            "QPushButton:hover{background-color: rgb(255, 0, 0);border:none;color:rgb(255, 255, 255);}"
+        )
+        self.sendButton.setGraphicsEffect(op)
         self.horizontalLayout.addWidget(self.sendButton)
         spacerItem1 = QtWidgets.QSpacerItem(
             178, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -163,6 +181,13 @@ class Ui_chat(object):
             248, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem2)
         self.exitButton = QtWidgets.QPushButton(Widget)
+        self.exitButton.setStyleSheet(
+            "QPushButton{background-color:rgb(255,255,255);border: 0px solid black;border-radius:8px;padding:10px 30px 10px 30px}"
+            "QPushButton:hover{background-color: rgb(255, 0, 0);border:none;color:rgb(255, 255, 255);}"
+        )
+        op2 = QtWidgets.QGraphicsOpacityEffect()
+        op2.setOpacity(0.8)
+        self.exitButton.setGraphicsEffect(op2)
         self.exitButton.setObjectName("exitButton")
         self.horizontalLayout.addWidget(self.exitButton)
         self.verticalLayout_2.addLayout(self.horizontalLayout)

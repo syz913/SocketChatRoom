@@ -14,8 +14,11 @@ def receive_message(client):  # Takes client socket as argument.
     name = ""
     prefix = ""
     while True:
-        message = client.recv(BUFSIZE)
-        print(message)
+        try:
+            message = client.recv(BUFSIZE)
+            print(message)
+        except:
+            pass
         if message is not None:
             message = message.decode("utf-8")
         # special case: empty message

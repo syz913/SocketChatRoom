@@ -7,7 +7,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSlot, Qt, QProcess, QDateTime, QFile, QTextStream
 from PyQt5.QtGui import QFont, QColor, QTextCursor, QTextCharFormat, QTextDocumentWriter
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QMessageBox, QFileDialog, QColorDialog, QHeaderView, QApplication, QMenu, QAction
-from MyQTextEdit import MyQTextEdit
 from Ui_Form.Ui_chat import Ui_chat
 import client
 
@@ -20,8 +19,12 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         self.networkInit()
         self.sendButton.clicked.connect(self.send)
         self.exitButton.clicked.connect(self.logout)
+        # Automatically adjusts the column width with the window size
         self.userTableWidget.horizontalHeader().setSectionResizeMode(
             QtWidgets.QHeaderView.Stretch)
+        # Automatically adjusts the row height with the window size
+        self.userTableWidget.horizontalHeader().setSectionResizeMode(
+            QHeaderView.Stretch)
         self.splitter.setStretchFactor(0, 7)
         self.splitter.setStretchFactor(1, 3)
         self.splitter_2.setStretchFactor(0, 6)
@@ -53,23 +56,32 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 self.messageBrowser.setAlignment(Qt.AlignRight)
             else:
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
+            # self.messageBrowser.setStyleSheet("QTextBrowser{background:#e8e8e8;}")
             self.messageBrowser.setTextColor(Qt.blue)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
             self.messageBrowser.append(message)
         elif type == "Private":
+            if username == "{PRIVATE}" + self.username:
+                self.messageBrowser.setAlignment(Qt.AlignRight)
+            else:
+                self.messageBrowser.setAlignment(Qt.AlignLeft)
             self.messageBrowser.setTextColor(Qt.red)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
             self.messageBrowser.append(message)
         if type == "NEW":
+            self.messageBrowser.setAlignment(Qt.AlignCenter)
             self.messageBrowser.setTextColor(Qt.gray)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 10))
             self.messageBrowser.append(newMessage + "  " + times)
+            self.messageBrowser.append(" ")
         if type == "LEFT":
+            self.messageBrowser.setAlignment(Qt.AlignCenter)
             self.messageBrowser.setTextColor(Qt.gray)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 10))
             self.messageBrowser.append(newMessage + "  " + times)
+            self.messageBrowser.append(" ")
         time.sleep(0.2)
         # self.scrollRecords.verticalScrollBar().setValue(
         #     self.scrollRecords.verticalScrollBar().maximum())
@@ -121,12 +133,15 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         for user in userlists:
             print("index:" + user)
             isOnline = users.index(user) if (user in users) else -1
+            font = QFont("Playball", 16)
             if isOnline == -1:
                 user = QTableWidgetItem(user+" ("+"off-line"+")")
+                user.setFont(font)
                 self.userTableWidget.insertRow(0)
                 self.userTableWidget.setItem(0, 0, user)
             else:
                 user = QTableWidgetItem(user+" ("+"online"+")")
+                user.setFont(font)
                 self.userTableWidget.insertRow(0)
                 self.userTableWidget.setItem(0, 0, user)
         online_user_cnt = "Online users: {}".format(len(users))
@@ -214,7 +229,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
 
     def getMessage(self):
         # add enter
-        self.messageTextEdit.append("")
+        self.messageTextEdit.append(" ")
         msg = self.messageTextEdit.toHtml()
         self.messageTextEdit.clear()
         self.messageTextEdit.setFocus()
@@ -241,7 +256,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         else:
             content = self.messageBrowser.toPlainText()
         try:
-            with codecs.open(fileName, 'w', encoding="gbk") as f:
+            with codecs.open(fileName, 'w', encoding="utf8") as f:
                 f.write(content)
             return True
         except IOError:

@@ -8,4 +8,5 @@
 ```
 pyrcc5 -o images_rc.py images.qrc
 ```
+为了使得每条信息之间有空隙，都append了空行
 ##### 聊天气泡
