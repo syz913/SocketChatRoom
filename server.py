@@ -17,10 +17,10 @@ def receive_message(client):  # Takes client socket as argument.
         try:
             message = client.recv(BUFSIZE)
             print(message)
+            if message is not None:
+                message = message.decode("utf-8")
         except:
             pass
-        if message is not None:
-            message = message.decode("utf-8")
         # special case: empty message
         if message == "":
             message = "{LOGOUT}"

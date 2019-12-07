@@ -53,23 +53,30 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             pass
         if type == "Message":
             if username == self.username:
+                message = self.handleMessage(message, 1)
                 self.messageBrowser.setAlignment(Qt.AlignRight)
             else:
+                message = self.handleMessage(message, 0)
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
+            print(message)
             # self.messageBrowser.setStyleSheet("QTextBrowser{background:#e8e8e8;}")
             self.messageBrowser.setTextColor(Qt.blue)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
             self.messageBrowser.append(message)
+            self.messageBrowser.append(" ")
         elif type == "Private":
             if username == "{PRIVATE}" + self.username:
+                message = self.handleMessage(message, 1)
                 self.messageBrowser.setAlignment(Qt.AlignRight)
             else:
+                message = self.handleMessage(message, 0)
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
             self.messageBrowser.setTextColor(Qt.red)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
             self.messageBrowser.append(message)
+            self.messageBrowser.append(" ")
         if type == "NEW":
             self.messageBrowser.setAlignment(Qt.AlignCenter)
             self.messageBrowser.setTextColor(Qt.gray)
@@ -229,10 +236,21 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
 
     def getMessage(self):
         # add enter
-        self.messageTextEdit.append(" ")
         msg = self.messageTextEdit.toHtml()
         self.messageTextEdit.clear()
         self.messageTextEdit.setFocus()
+        return msg
+
+    def handleMessage(self, msg, type):
+        style1 = "<p style=\"background:rgb(145,237,97); width:fit-content; padding-left:10px; border-radius:6px;"
+        style2 = "<p style=\"background:rgb(204, 204, 204); width:fit-content; padding:10px; border:1px solid gray; border-radius:6px;"
+        messages = msg.split("<p style=\"")
+        # self
+        if type == 1:
+            msg = messages[0] + style1 + messages[1]
+        # others
+        else:
+            msg = messages[0] + style2 + messages[1]
         return msg
 
     def sendTowhom(self, sendlist):
@@ -244,7 +262,6 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         cursor = self.messageTextEdit.textCursor()
         if not cursor.hasSelection():
             cursor.select(QTextCursor.Document)
-
         cursor.mergeCharFormat(format)
         self.messageTextEdit.mergeCurrentCharFormat(format)
 

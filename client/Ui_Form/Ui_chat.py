@@ -37,6 +37,7 @@ class Ui_chat(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.messageBrowser = QtWidgets.QTextBrowser(self.layoutWidget)
         self.messageBrowser.setObjectName("messageBrowser")
+        self.messageBrowser.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.messageBrowser.setStyleSheet( 
             "background-color:rgb(255,255,255);border-radius:8px;padding:10px;\n"
             "background-image:url(:/image/bg1.jpg)")
@@ -150,7 +151,9 @@ class Ui_chat(object):
         self.userTableWidget.horizontalHeader().setStyleSheet(
             "font-size:30px;font-family:华文琥珀;"
         )
-        self.userTableWidget.setStyleSheet('background-image:url(:/image/bg2.jpg)')
+        self.userTableWidget.setStyleSheet(
+            "background-color:rgb(255,255,255);border-radius:8px;margin-top:10px;\n"
+            "background-image:url(:/image/bg2.jpg)")
         self.userTableWidget.setColumnCount(1)
         self.userTableWidget.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
