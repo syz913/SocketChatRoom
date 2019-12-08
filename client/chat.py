@@ -3,6 +3,7 @@ import sys
 import codecs
 import threading
 import time
+import re
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSlot, Qt, QProcess, QDateTime, QFile, QTextStream
 from PyQt5.QtGui import QFont, QColor, QTextCursor, QTextCharFormat, QTextDocumentWriter
@@ -48,7 +49,6 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         try:
             username = newMessage.split(" : ")[0]
             message = newMessage.split(" : ")[1]
-            # print(message)
         except:
             pass
         if type == "Message":
@@ -138,7 +138,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             if isNew == -1:
                 userlists.append(user)
         for user in userlists:
-            print("index:" + user)
+            # print("index:" + user)
             isOnline = users.index(user) if (user in users) else -1
             font = QFont("Playball", 16)
             if isOnline == -1:
@@ -168,7 +168,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 index)  # updating, maintain receiver
         else:
             # friend left, set sendListBox "ALL"
-            self.sendListBox.setCurrentIndex(0)
+            self.SizeComboBox1.setCurrentIndex(0)
 
     def refresh_interface(self):
         while self.connected:
@@ -242,15 +242,34 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         return msg
 
     def handleMessage(self, msg, type):
-        style1 = "<p style=\"background:rgb(145,237,97); width:fit-content; padding-left:10px; border-radius:6px;"
-        style2 = "<p style=\"background:rgb(204, 204, 204); width:fit-content; padding:10px; border:1px solid gray; border-radius:6px;"
-        messages = msg.split("<p style=\"")
+        print(msg)
+        style1 = " style = \"background:rgb(145,237,97); width:fit-content; padding:10px;\
+                border:1px solid gray;line-height:30px; border-radius:6px;"
+        style2 = " style = \"background:rgb(204, 204, 204); width:fit-content; padding:10px;\
+                border:1px solid gray;line-height:300%; border-radius:6px;"
+        style_base = re.findall(".*<span style=\" (.*)\">", msg)
+        print(style_base)
+        messages = msg.split("<style type=\"text/css\">")
+        if len(style_base) == 0:
+            words = re.findall(".*;\">(.*)</p>.*", messages[1])
+        else:
+            words = re.findall(".*;\">(.*)</span>.*", messages[1])
+        message = " "
+        for word in words:
+            if word != "<br />":
+                message += word
         # self
         if type == 1:
-            msg = messages[0] + style1 + messages[1]
+            if len(style_base) == 0:
+                msg = messages[0] + style1 + "</head><body>" + "<p><span" + style1 + "\">" + message + " </span></p></body></html>"
+            else:
+                msg = messages[0] + style1 + "</head><body>" + "<p><span" + style1 + style_base[0] + "\">" + message + " </span></p></body></html>"
         # others
         else:
-            msg = messages[0] + style2 + messages[1]
+            if len(style_base) == 0:
+                msg = messages[0] + style2 + "</head><body>" + "<p><span" + style2 + "\">" + message + " </span></p></body></html>"
+            else:
+                msg = messages[0] + style2 + "</head><body>" + "<p><span" + style2 + style_base[0] + "\">" + message + " </span></p></body></html>"
         return msg
 
     def sendTowhom(self, sendlist):
