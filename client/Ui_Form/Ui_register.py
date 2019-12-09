@@ -1,16 +1,7 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'd:\Windows\Desktop\计算机网络\Lab\final-pj\Socket-Project\client\Ui_Form\untitled.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
-
-
+import Ui_Form.images_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
-class Ui_login(object):
+class Ui_register(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(340, 245)
@@ -28,18 +19,6 @@ class Ui_login(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        # self.PortlineEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget_2)
-        # self.PortlineEdit.setObjectName("PortlineEdit")
-        # self.PortlineEdit.setStyleSheet(
-        #     "color:black"
-        # )
-        # self.verticalLayout_3.addWidget(self.PortlineEdit)
-        # self.IPlineEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget_2)
-        # self.IPlineEdit.setObjectName("IPlineEdit")
-        # self.IPlineEdit.setStyleSheet(
-        #     "color:black"
-        # )
-        # self.verticalLayout_3.addWidget(self.IPlineEdit)
         self.NamelineEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget_2)
         self.NamelineEdit.setObjectName("NamelineEdit")
         self.NamelineEdit.setStyleSheet(
@@ -74,18 +53,8 @@ class Ui_login(object):
         self.Passlabel = QtWidgets.QLabel(self.verticalLayoutWidget)
         self.Passlabel.setObjectName("Passlabel")
         self.verticalLayout_4.addWidget(self.Passlabel)
-        self.LoginButton = QtWidgets.QPushButton(Form)
-        self.LoginButton.setGeometry(QtCore.QRect(80, 190, 80, 28)) #left up width height
-        self.LoginButton.setObjectName("LoginButton")
-        self.LoginButton.setStyleSheet(
-            "QPushButton{background-color:rgb(255,255,255);border: 0px solid black;border-radius:8px;color:black}"
-            "QPushButton:hover{background-color: rgb(255, 0, 0);border:none;color:rgb(255, 255, 255);}"
-        )
-        op = QtWidgets.QGraphicsOpacityEffect()
-        op.setOpacity(0.8)
-        self.LoginButton.setGraphicsEffect(op)
         self.RegisterButton = QtWidgets.QPushButton(Form)
-        self.RegisterButton.setGeometry(QtCore.QRect(190, 190, 80, 28))
+        self.RegisterButton.setGeometry(QtCore.QRect(150, 180, 80, 28))
         self.RegisterButton.setObjectName("RegisterButton")
         self.RegisterButton.setStyleSheet(
             "QPushButton{background-color:rgb(255,255,255);border: 0px solid black;border-radius:8px;color:black}"
@@ -99,22 +68,17 @@ class Ui_login(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Login"))
-        self.label.setText(_translate("Form", "Welcome To Chat!"))
-        # self.Portlabel.setText(_translate("Form", "Port"))
-        # self.IPlabel.setText(_translate("Form", "IP"))
+        Form.setWindowTitle(_translate("Form", "Register"))
         self.Namelabel.setText(_translate("Form", "UserName"))
         self.Passlabel.setText(_translate("Form", "PassWord"))
-        self.LoginButton.setText(_translate("Form", "Login"))
-        self.LoginButton.setToolTip(_translate("Form", "<font color='black'>ENTER</font>"))
         self.RegisterButton.setText(_translate("Form", "Register"))
-        self.RegisterButton.setToolTip(_translate("From", "<font color='black'>CTRL+R</font>"))
+        self.RegisterButton.setToolTip(_translate("From", "<font color='black'>ENTER</font>"))
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Widget = QtWidgets.QWidget()
-    ui = Ui_login()
+    ui = Ui_register()
     ui.setupUi(Widget)
     Widget.show()
     sys.exit(app.exec_())

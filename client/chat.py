@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QMessageBox, QFileDialog,
 from Ui_Form.Ui_chat import Ui_chat
 import client
 
-
 class ChatWidget(QtWidgets.QWidget, Ui_chat):
     def __init__(self, parent=None):
         super(ChatWidget, self).__init__(parent)
@@ -58,8 +57,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             else:
                 message = self.handleMessage(message, 0)
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
-            print(message)
-            # self.messageBrowser.setStyleSheet("QTextBrowser{background:#e8e8e8;}")
+            # print(message)
             self.messageBrowser.setTextColor(Qt.blue)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
@@ -241,14 +239,13 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         self.messageTextEdit.setFocus()
         return msg
 
+    # alter the CSS, but QTextBrowser don't support many attributes
     def handleMessage(self, msg, type):
-        print(msg)
         style1 = " style = \"background:rgb(145,237,97); width:fit-content; padding:10px;\
                 border:1px solid gray;line-height:30px; border-radius:6px;"
         style2 = " style = \"background:rgb(204, 204, 204); width:fit-content; padding:10px;\
                 border:1px solid gray;line-height:300%; border-radius:6px;"
         style_base = re.findall(".*<span style=\" (.*)\">", msg)
-        print(style_base)
         messages = msg.split("<style type=\"text/css\">")
         if len(style_base) == 0:
             words = re.findall(".*;\">(.*)</p>.*", messages[1])
