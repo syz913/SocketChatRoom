@@ -9,7 +9,7 @@
 ##### 数据库
 决定使用轻量级的`sqlite`数据库存储用户信息和聊天信息
 其中简单建立了两个表格 
-
+在多进程操作sqlite的示例代码中，采用producer和consumer的模式来处理，没有特殊之处，但需要注意的是：在建立sqlite3的connection的时候，需要设置check_same_thread = False。
 ```
 CREATE TABLE users(
     username  TEXT  PRIMARY KEY   NOT NULL,
@@ -17,9 +17,10 @@ CREATE TABLE users(
 );
 
 CREATE TABLE messages(
-    username  TEXT  PRIMARY KEY  NOT NULL,
+    username  TEXT  NOT NULL,
     date  TEXT  NOT NULL,
-    message   TEXT  NOT NULL
+    message   TEXT  NOT NULL,
+    type  TEXT  NOT NULL
 );
 ```
 ##### 背景图

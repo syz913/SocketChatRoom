@@ -29,7 +29,7 @@ class ClientWidget(QtWidgets.QWidget, Ui_login):
         self.RegisterButton.clicked.connect(self.register)
 
     def connect_server(self):
-        conn_db = sqlite3.connect('pydb.db')
+        conn_db = sqlite3.connect('socketdb.db')
         print ("Opened database successfully")
         cursor = conn_db.execute("select username, password from users")
         users.clear()
@@ -37,6 +37,7 @@ class ClientWidget(QtWidgets.QWidget, Ui_login):
             users[user[0]] = user[1]
         if self.connected:
             return
+        conn_db.close()
         name = self.NamelineEdit.text()
         password = self.PasslineEdit.text()
         # special case: no name

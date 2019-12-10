@@ -16,7 +16,7 @@ class RegisterWidget(QtWidgets.QWidget, Ui_register):
 
     def register(self):
          # init db
-        self.conn_db = sqlite3.connect('pydb.db')
+        self.conn_db = sqlite3.connect('socketdb.db')
         cursor = self.conn_db.execute("select username, password from users")
         users.clear()
         for user in cursor:
@@ -35,11 +35,11 @@ class RegisterWidget(QtWidgets.QWidget, Ui_register):
         else:
             c.execute("insert into users values ('"+ username + "','" + password + "')")
             self.conn_db.commit()
-            self.conn_db.close()
         msg = QtWidgets.QMessageBox()
         reply = msg.warning(self, "Warning", "<font color='black'>Register successfully!</font>",
                             QtWidgets.QMessageBox.Yes)
         if reply == QtWidgets.QMessageBox.Yes:
+            self.conn_db.close()
             self.close()
         
     # keyboard events

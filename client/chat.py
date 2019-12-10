@@ -4,12 +4,14 @@ import codecs
 import threading
 import time
 import re
+import sqlite3
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSlot, Qt, QProcess, QDateTime, QFile, QTextStream
 from PyQt5.QtGui import QFont, QColor, QTextCursor, QTextCharFormat, QTextDocumentWriter
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QMessageBox, QFileDialog, QColorDialog, QHeaderView, QApplication, QMenu, QAction
 from Ui_Form.Ui_chat import Ui_chat
 import client
+import DataBase
 
 class ChatWidget(QtWidgets.QWidget, Ui_chat):
     def __init__(self, parent=None):
@@ -38,8 +40,17 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         self.username = ""
         self.connected = False
         self.sendList = "ALL"
-        currentUser = ""
-        self.setWindowTitle(currentUser)
+    
+    def messageInit(self):
+        conn = sqlite3.connect("socketdb.db")
+        cursor = conn.execute("select * from messages")
+        for messages in cursor:
+            username = messages[0]
+            date = messages[1]
+            message = messages[2]
+            type = messages[3]
+            self.init_messgae(username, message, date, type)
+        conn.close()
 
     def show_message(self, newMessage, type):
         times = QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
@@ -57,6 +68,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             else:
                 message = self.handleMessage(message, 0)
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
+            DataBase.save_message(username, times, message, "Message")
             # print(message)
             self.messageBrowser.setTextColor(Qt.blue)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
@@ -70,6 +82,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             else:
                 message = self.handleMessage(message, 0)
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
+            DataBase.save_message(username, times, message, "Private")
             self.messageBrowser.setTextColor(Qt.red)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
@@ -90,6 +103,29 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         time.sleep(0.2)
         # self.scrollRecords.verticalScrollBar().setValue(
         #     self.scrollRecords.verticalScrollBar().maximum())
+
+    def init_messgae(self, username, message, times, type):
+        if type == "Message":
+            if username == self.username:
+                self.messageBrowser.setAlignment(Qt.AlignRight)
+            else:
+                self.messageBrowser.setAlignment(Qt.AlignLeft)
+            # print(message)
+            self.messageBrowser.setTextColor(Qt.blue)
+            self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
+            self.messageBrowser.append("[" + username + "]  " + times)
+            self.messageBrowser.append(message)
+            self.messageBrowser.append(" ")
+        elif type == "Private":
+            if username == "{PRIVATE}" + self.username:
+                self.messageBrowser.setAlignment(Qt.AlignRight)
+            else:
+                self.messageBrowser.setAlignment(Qt.AlignLeft)
+            self.messageBrowser.setTextColor(Qt.red)
+            self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
+            self.messageBrowser.append("[" + username + "]  " + times)
+            self.messageBrowser.append(message)
+            self.messageBrowser.append(" ")
 
     def send_message(self):
         # Special case: friend leave as the same time with send message
@@ -209,6 +245,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             self.conn = socket.socket()
             return False
         self.username = name
+        self.messageInit()
         # # send to server message type: {LOGIN}
         message = bytes("{LOGIN}" + name, "utf-8")
         self.conn.send(message)
