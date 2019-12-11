@@ -6,6 +6,7 @@ import sqlite3
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Ui_Form.Ui_register import Ui_register
 import DataBase
+import secret
 
 class RegisterWidget(QtWidgets.QWidget, Ui_register):
     def __init__(self, parent=None):
@@ -17,10 +18,10 @@ class RegisterWidget(QtWidgets.QWidget, Ui_register):
     def register(self):
          # init db
         self.conn_db = sqlite3.connect('socketdb.db')
-        cursor = self.conn_db.execute("select username, password from users")
+        cursor = self.conn_db.execute("select username from users")
         users.clear()
         for user in cursor:
-            users[user[0]] = user[1]
+            users.append(user[0])
         username = self.NamelineEdit.text()
         password = self.PasslineEdit.text()
         c = self.conn_db.cursor()
@@ -28,12 +29,17 @@ class RegisterWidget(QtWidgets.QWidget, Ui_register):
             QtWidgets.QMessageBox.warning(self, "Warning", "<font color='black'>Name or password can't be NULL!</font>",
                             QtWidgets.QMessageBox.NoButton)
             return
-        if username in users.keys():
+        if username in users:
             QtWidgets.QMessageBox.warning(self, "Warning", "<font color='black'>" + username + " is already exist!</font>",
                             QtWidgets.QMessageBox.NoButton)
             return
         else:
-            c.execute("insert into users values ('"+ username + "','" + password + "')")
+            keys = secret.get_key()
+            public_key = keys["public_key"]
+            private_key = keys["private_key"]
+            signature = secret.rsa_sinature_encode(password, private_key)
+            c.execute("insert into users (username, public_key, signature) values (?, ?, ?)",
+                (username, public_key, signature))
             self.conn_db.commit()
         msg = QtWidgets.QMessageBox()
         reply = msg.warning(self, "Warning", "<font color='black'>Register successfully!</font>",
@@ -51,7 +57,7 @@ class RegisterWidget(QtWidgets.QWidget, Ui_register):
         if (event.key() + 1 == QtCore.Qt.Key_Enter):
             self.register()
 
-users = {}
+users = []
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     Client = RegisterWidget()

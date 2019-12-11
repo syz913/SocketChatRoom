@@ -1,15 +1,26 @@
-# SocketChatRoom
+# <center>SocketChatRoom</center>
+
+<right>史一哲 17300290027</right>
+
 - [数据库](#数据库)
 
 > 以下为界面优化部分
 - [加背景图](#背景图)
 - [实现聊天界面的气泡效果](#聊天气泡)
 
+#### 运行方法
 
-##### 数据库
-决定使用轻量级的`sqlite`数据库存储用户信息和聊天信息
-其中简单建立了两个表格 
-在多进程操作sqlite的示例代码中，采用producer和consumer的模式来处理，没有特殊之处，但需要注意的是：在建立sqlite3的connection的时候，需要设置check_same_thread = False。
+```
+python server.py
+python client\client.py
+```
+
+
+
+
+#### 数据库
+决定使用轻量级的 `sqlite` 数据库存储用户信息和聊天信息，其中密码使用 `Pycrypto` 进行 `RSA` 加密
+
 ```
 CREATE TABLE users(
     username  TEXT  PRIMARY KEY   NOT NULL,
@@ -23,7 +34,7 @@ CREATE TABLE messages(
     type  TEXT  NOT NULL
 );
 ```
-##### 背景图
+#### 背景图
 导入资源文件 #https://blog.csdn.net/weixin_42296333/article/details/81178915
 ```
 pyrcc5 -o images_rc.py images.qrc

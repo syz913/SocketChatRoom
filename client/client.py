@@ -8,6 +8,7 @@ from Ui_Form.Ui_login import Ui_login
 import chat
 import register
 import DataBase
+import secret
 
 class ClientWidget(QtWidgets.QWidget, Ui_login):
     def __init__(self, parent=None):
@@ -31,10 +32,11 @@ class ClientWidget(QtWidgets.QWidget, Ui_login):
     def connect_server(self):
         conn_db = sqlite3.connect('socketdb.db')
         print ("Opened database successfully")
-        cursor = conn_db.execute("select username, password from users")
+        cursor = conn_db.execute("select username, public_key, signature from users")
         users.clear()
         for user in cursor:
-            users[user[0]] = user[1]
+            keys = [user[1], user[2]]
+            users[user[0]] = keys
         if self.connected:
             return
         conn_db.close()
@@ -58,7 +60,11 @@ class ClientWidget(QtWidgets.QWidget, Ui_login):
         # else:
         #     port = int(port)
         if name in users.keys():
-            if users[name] == password:
+            # check the password
+            public_key = users[name][0]
+            signature = users[name][1]
+            verify = secret.rsa_signature_decode(password, public_key, signature)
+            if verify:
                 IP = "127.0.0.1"
                 port = 30153
                 if ChatWidget.connect_server(name, IP, port) == True:
@@ -98,6 +104,7 @@ class ClientWidget(QtWidgets.QWidget, Ui_login):
                 print("enter")
 
 users = {}
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     Client = ClientWidget()

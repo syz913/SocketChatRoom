@@ -43,14 +43,19 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
     
     def messageInit(self):
         conn = sqlite3.connect("socketdb.db")
-        cursor = conn.execute("select * from messages")
+        cursor = conn.execute("select * from messages where owner = '" + self.username + "'")
         for messages in cursor:
-            username = messages[0]
-            date = messages[1]
-            message = messages[2]
-            type = messages[3]
+            username = messages[1]
+            date = messages[2]
+            message = messages[3]
+            type = messages[4]
             self.init_messgae(username, message, date, type)
         conn.close()
+        self.messageBrowser.setAlignment(Qt.AlignCenter)
+        self.messageBrowser.setTextColor(Qt.gray)
+        self.messageBrowser.setCurrentFont(QFont("Times New Roman", 10))
+        self.messageBrowser.append("--- Above is chat history ---")
+        self.messageBrowser.append(" ")
 
     def show_message(self, newMessage, type):
         times = QDateTime.currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
@@ -68,7 +73,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             else:
                 message = self.handleMessage(message, 0)
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
-            DataBase.save_message(username, times, message, "Message")
+            DataBase.save_message(self.username, username, times, message, "Message")
             # print(message)
             self.messageBrowser.setTextColor(Qt.blue)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
@@ -82,7 +87,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             else:
                 message = self.handleMessage(message, 0)
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
-            DataBase.save_message(username, times, message, "Private")
+            DataBase.save_message(self.username, username, times, message, "Private")
             self.messageBrowser.setTextColor(Qt.red)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
