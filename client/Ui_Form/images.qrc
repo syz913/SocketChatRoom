@@ -5,6 +5,7 @@
         <file alias="image/bg2.jpg">image/bg2.jpg</file>
         <file alias="image/sky.jpg">image/sky.jpg</file>
         <file alias="image/sky2.jpg">image/sky2.jpg</file>
+        <file alias="image/picture.png">image/picture.png</file>
         <file alias="image/bold.png">image/bold.png</file>
         <file alias="image/clear.png">image/clear.png</file>
         <file alias="image/color.png">image/color.png</file>

@@ -5,7 +5,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_chat(object):
     def setupUi(self, Widget):
         Widget.setObjectName("Widget")
-        Widget.resize(900, 800)
+        Widget.resize(920, 800)
 
         palette = QtGui.QPalette()
         palette.setBrush(QtGui.QPalette.Background, QtGui.QBrush(QtGui.QPixmap(":/image/sky.jpg")))  
@@ -74,6 +74,17 @@ class Ui_chat(object):
         self.SizeComboBox.addItem("")
         self.SizeComboBox.addItem("")
         self.horizontalLayout_2.addWidget(self.SizeComboBox)
+        self.imageBtn = QtWidgets.QToolButton(self.layoutWidget)
+        self.imageBtn.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/image/picture.png"),
+                       QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.imageBtn.setIcon(icon)
+        self.imageBtn.setIconSize(QtCore.QSize(22, 22))
+        self.imageBtn.setCheckable(True)
+        self.imageBtn.setAutoRaise(True)
+        self.imageBtn.setObjectName("imageBtn")
+        self.horizontalLayout_2.addWidget(self.imageBtn)
         self.boldToolBtn = QtWidgets.QToolButton(self.layoutWidget)
         self.boldToolBtn.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         icon = QtGui.QIcon()
@@ -220,6 +231,8 @@ class Ui_chat(object):
         self.SizeComboBox.setItemText(11, _translate("Widget", "20"))
         self.SizeComboBox.setItemText(12, _translate("Widget", "21"))
         self.SizeComboBox.setItemText(13, _translate("Widget", "22"))
+        self.imageBtn.setToolTip(_translate("Widget", "表情"))
+        self.imageBtn.setText(_translate("Widget", "..."))
         self.boldToolBtn.setToolTip(_translate("Widget", "加粗"))
         self.boldToolBtn.setText(_translate("Widget", "..."))
         self.italicToolBtn.setToolTip(_translate("Widget", "倾斜"))

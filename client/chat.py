@@ -5,6 +5,9 @@ import threading
 import time
 import re
 import sqlite3
+import win32ui
+import struct
+import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSlot, Qt, QProcess, QDateTime, QFile, QTextStream
 from PyQt5.QtGui import QFont, QColor, QTextCursor, QTextCharFormat, QTextDocumentWriter
@@ -19,7 +22,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         self.setupUi(self)
         self.setWindowOpacity(1)
         self.networkInit()
-        self.sendButton.clicked.connect(self.send)
+        # self.sendButton.clicked.connect(self.send("TEXT"))
         self.exitButton.clicked.connect(self.logout)
         # Automatically adjusts the column width with the window size
         self.userTableWidget.horizontalHeader().setSectionResizeMode(
@@ -79,6 +82,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
             self.messageBrowser.append(message)
+            # self.messageBrowser.append("😍😙")
             self.messageBrowser.append(" ")
         elif type == "Private":
             if username == "{PRIVATE}" + self.username:
@@ -91,6 +95,30 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             self.messageBrowser.setTextColor(Qt.red)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
+            self.messageBrowser.append(message)
+            self.messageBrowser.append(" ")
+        if type == "FILE":
+            if username == self.username:
+                self.messageBrowser.setAlignment(Qt.AlignRight)
+            else:
+                self.messageBrowser.setAlignment(Qt.AlignLeft)
+            DataBase.save_message(self.username, username, times, message, "FILE")
+            self.messageBrowser.setTextColor(Qt.blue)
+            self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
+            self.messageBrowser.append("[" + username + "]  " + times)
+            self.messageBrowser.append(" ")
+            self.messageBrowser.append(message)
+            self.messageBrowser.append(" ")
+        if type == "PRIVATEFILE":
+            if username == self.username:
+                self.messageBrowser.setAlignment(Qt.AlignRight)
+            else:
+                self.messageBrowser.setAlignment(Qt.AlignLeft)
+            DataBase.save_message(self.username, username, times, message, "FILE")
+            self.messageBrowser.setTextColor(Qt.red)
+            self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
+            self.messageBrowser.append("[{Private}" + username + "]  " + times)
+            self.messageBrowser.append(" ")
             self.messageBrowser.append(message)
             self.messageBrowser.append(" ")
         if type == "NEW":
@@ -131,38 +159,80 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             self.messageBrowser.append("[" + username + "]  " + times)
             self.messageBrowser.append(message)
             self.messageBrowser.append(" ")
+        elif type == "FILE":
+            if username == self.username:
+                self.messageBrowser.setAlignment(Qt.AlignRight)
+            else:
+                self.messageBrowser.setAlignment(Qt.AlignLeft)
+            self.messageBrowser.setTextColor(Qt.blue)
+            self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
+            self.messageBrowser.append("[" + username + "]  " + times)
+            self.messageBrowser.append(" ")
+            self.messageBrowser.append(message)
+            self.messageBrowser.append(" ")
+        elif type == "PRIVATEFILE":
+            if username == self.username:
+                self.messageBrowser.setAlignment(Qt.AlignRight)
+            else:
+                self.messageBrowser.setAlignment(Qt.AlignLeft)
+            self.messageBrowser.setTextColor(Qt.red)
+            self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
+            self.messageBrowser.append("[{Private}" + username + "]  " + times)
+            self.messageBrowser.append(" ")
+            self.messageBrowser.append(message)
+            self.messageBrowser.append(" ")
 
-    def send_message(self):
-        # Special case: friend leave as the same time with send message
-        if self.sendList != self.SizeComboBox1.currentText():
-            QMessageBox.warning(self, "Warning",
-                                "The person has left. Private message not delivered!", QMessageBox.Ok)
+    def send_message(self, type):
+        if type == "TEXT":
+            # Special case: friend leave as the same time with send message
+            if self.sendList != self.SizeComboBox1.currentText():
+                QMessageBox.warning(self, "Warning",
+                                    "The person has left. Private message not delivered!", QMessageBox.Ok)
+                self.messageTextEdit.clear()
+                return
+            # line = self.messageTextEdit.toPlainText()
+            message = self.getMessage()
+            # Special case: Empty message
+            if message == "":
+                QMessageBox.warning(self, "Warning",
+                                    "The sending message cannot be empty", QMessageBox.Ok)
+                return
+            # Special case: illegal character
+            if '{CLIENTS}' in message or '{MESSAGE}' in message:
+                QMessageBox.warning(self, "Warning",
+                                    "Do not use word: '{CLIENTS}', '{MESSAGE}'", QMessageBox.Ok)
+                self.messageTextEdit.clear()
+                return
+            # Private message: Send to me(server)
+            if self.sendList != "ALL":
+                message1 = bytes("{" + self.username + "}" + str(message), "utf-8")
+                self.conn.sendall(message1)
+                time.sleep(0.1)
+            # send message to server. message type: {sendList}
+            message2 = bytes("{" + self.sendList + "}" + str(message), "utf-8")
+            self.conn.sendall(message2)
             self.messageTextEdit.clear()
-            return
-        # line = self.messageTextEdit.toPlainText()
-        message = self.getMessage()
-        # Special case: Empty message
-        if message == "":
-            QMessageBox.warning(self, "Warning",
-                                "The sending message cannot be empty", QMessageBox.Ok)
-            return
-        # Special case: illegal character
-        if '{CLIENTS}' in message or '{MESSAGE}' in message:
-            QMessageBox.warning(self, "Warning",
-                                "Do not use word: '{CLIENTS}', '{MESSAGE}'", QMessageBox.Ok)
-            self.messageTextEdit.clear()
-            return
-        # Private message: Send to me(server)
-        if self.sendList != "ALL":
-            message1 = bytes("{" + self.username + "}" + str(message), "utf-8")
-            self.conn.sendall(message1)
-            time.sleep(0.1)
-        # send message to server. message type: {sendList}
-        message2 = bytes("{" + self.sendList + "}" + str(message), "utf-8")
-        self.conn.sendall(message2)
-        self.messageTextEdit.clear()
-        # self.scrollRecords.verticalScrollBar().setValue(
-        #     self.scrollRecords.verticalScrollBar().maximum())
+            # self.scrollRecords.verticalScrollBar().setValue(
+            #     self.scrollRecords.verticalScrollBar().maximum())
+        elif type == "FILE":
+            if os.path.isfile(self.filepath):
+                # # 定义定义文件信息。128s表示文件名为128bytes长，l表示一个int或log文件类型，在此为文件大小
+                # fileinfo_size = struct.calcsize('128sl')
+                # 定义文件头信息，包含文件名和文件大小
+                fhead = struct.pack(
+                        '128sl',
+                        os.path.basename(self.filepath).encode(encoding="utf-8"),
+                        os.stat(self.filepath).st_size)
+                print('client filepath: {0}'.format(self.filepath))
+                self.conn.sendall(fhead)                    
+                fp = open(self.filepath, 'rb')
+                while True:
+                    data = fp.read(1024)
+                    if not data:
+                        self.conn.sendall(bytes(self.sendList + "|" + self.username, "utf-8"))
+                        print('file send over...')
+                        break
+                    self.conn.sendall(data)
 
     def refresh_friendlist(self, userList):
         users = userList.split("|")
@@ -235,6 +305,12 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                     self.show_message(message[5:], "NEW")
                 elif message[:6] == "{LEFT}":
                     self.show_message(message[6:], "LEFT")
+                elif message[:6] == "{FILE}":
+                    self.show_message(message[6:], "FILE")
+                    self.messageBrowser.moveCursor(QTextCursor.End)
+                elif message[:13] == "{PRIVATEFILE}":
+                    self.show_message(message[13:], "PRIVATEFILE")
+                    self.messageBrowser.moveCursor(QTextCursor.End)
                 # message type: None Type - receive private message
                 else:
                     self.show_message(message, "Private")
@@ -360,6 +436,17 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         self.messageTextEdit.setFocus()
 
     @pyqtSlot(bool)
+    def on_imageBtn_clicked(self, checked):
+
+        dlg = win32ui.CreateFileDialog(1)  # 1 means open the file dialog box
+        dlg.SetOFNInitialDir('C:/')  # initial directory
+        dlg.DoModal()
+        self.filepath = dlg.GetPathName()  # Get the name of the selected file
+        # self.messageTextEdit.append("<img src=\""+self.filepath+"\">")
+        print(self.filepath)
+        self.send("FILE")
+
+    @pyqtSlot(bool)
     def on_boldToolBtn_clicked(self, checked):
 
         fmt = QTextCharFormat()
@@ -414,11 +501,16 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
     def on_clearToolBtn_clicked(self):
 
         self.messageBrowser.clear()
+    
+    @pyqtSlot()
+    def on_sendButton_clicked(self):
+
+        self.send("TEXT")
 
     # @pyqtSlot()
-    def send(self):
+    def send(self, type):
 
-        self.send_message()
+        self.send_message(type)
 
     def logout(self):
         reply = QtWidgets.QMessageBox.warning(self, u"logout", u"Are you sure to logout?",
@@ -444,7 +536,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             self.logout()
         if (event.key() + 1 == Qt.Key_Enter):
             if QApplication.keyboardModifiers() == Qt.ControlModifier:
-                self.send()
+                self.send("TEXT")
             else:
                 print("enter")
 
