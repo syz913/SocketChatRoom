@@ -16,6 +16,7 @@ from Ui_Form.Ui_chat import Ui_chat
 import client
 import DataBase
 
+
 class ChatWidget(QtWidgets.QWidget, Ui_chat):
     def __init__(self, parent=None):
         super(ChatWidget, self).__init__(parent)
@@ -43,10 +44,11 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         self.username = ""
         self.connected = False
         self.sendList = "ALL"
-    
+
     def messageInit(self):
         conn = sqlite3.connect("socketdb.db")
-        cursor = conn.execute("select * from messages where owner = '" + self.username + "'")
+        cursor = conn.execute(
+            "select * from messages where owner = '" + self.username + "'")
         for messages in cursor:
             username = messages[1]
             date = messages[2]
@@ -76,7 +78,8 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             else:
                 message = self.handleMessage(message, 0)
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
-            DataBase.save_message(self.username, username, times, message, "Message")
+            DataBase.save_message(self.username, username,
+                                  times, message, "Message")
             # print(message)
             self.messageBrowser.setTextColor(Qt.blue)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
@@ -91,7 +94,8 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             else:
                 message = self.handleMessage(message, 0)
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
-            DataBase.save_message(self.username, username, times, message, "Private")
+            DataBase.save_message(self.username, username,
+                                  times, message, "Private")
             self.messageBrowser.setTextColor(Qt.red)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
@@ -102,7 +106,8 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 self.messageBrowser.setAlignment(Qt.AlignRight)
             else:
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
-            DataBase.save_message(self.username, username, times, message, "FILE")
+            DataBase.save_message(self.username, username,
+                                  times, message, "FILE")
             self.messageBrowser.setTextColor(Qt.blue)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
@@ -114,7 +119,15 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 self.messageBrowser.append(message)
                 self.messageBrowser.append(" ")
             else:
-                self.messageBrowser.append("<img src=\"./client/materials/pdf.png\">")
+                if ".doc" in fileName:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/doc.png\">")
+                elif ".txt" in fileName:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/txt.png\">")
+                else:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/pdf.png\">")
                 self.messageBrowser.append(fileName)
                 self.messageBrowser.append(" ")
         if type == "PRIVATEFILE":
@@ -122,7 +135,8 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 self.messageBrowser.setAlignment(Qt.AlignRight)
             else:
                 self.messageBrowser.setAlignment(Qt.AlignLeft)
-            DataBase.save_message(self.username, username, times, message, "FILE")
+            DataBase.save_message(self.username, username,
+                                  times, message, "FILE")
             self.messageBrowser.setTextColor(Qt.red)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[{Private}" + username + "]  " + times)
@@ -134,7 +148,15 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 self.messageBrowser.append(message)
                 self.messageBrowser.append(" ")
             else:
-                self.messageBrowser.append("<img src=\"./client/materials/pdf.png\">")
+                if ".doc" in fileName:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/doc.png\">")
+                elif ".txt" in fileName:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/txt.png\">")
+                else:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/pdf.png\">")
                 self.messageBrowser.append(fileName)
                 self.messageBrowser.append(" ")
         if type == "NEW":
@@ -191,7 +213,15 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 self.messageBrowser.append(message)
                 self.messageBrowser.append(" ")
             else:
-                self.messageBrowser.append("<img src=\"./client/materials/pdf.png\">")
+                if ".doc" in fileName:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/doc.png\">")
+                elif ".txt" in fileName:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/txt.png\">")
+                else:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/pdf.png\">")
                 self.messageBrowser.append(fileName)
                 self.messageBrowser.append(" ")
         elif type == "PRIVATEFILE":
@@ -210,7 +240,15 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 self.messageBrowser.append(message)
                 self.messageBrowser.append(" ")
             else:
-                self.messageBrowser.append("<img src=\"./client/materials/pdf.png\">")
+                if ".doc" in fileName:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/doc.png\">")
+                elif ".txt" in fileName:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/txt.png\">")
+                else:
+                    self.messageBrowser.append(
+                        "<img src=\"./client/materials/pdf.png\">")
                 self.messageBrowser.append(fileName)
                 self.messageBrowser.append(" ")
 
@@ -237,7 +275,8 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 return
             # Private message: Send to me(server)
             if self.sendList != "ALL":
-                message1 = bytes("{" + self.username + "}" + str(message), "utf-8")
+                message1 = bytes("{" + self.username + "}" +
+                                 str(message), "utf-8")
                 self.conn.sendall(message1)
                 time.sleep(0.1)
             # send message to server. message type: {sendList}
@@ -252,16 +291,18 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 # fileinfo_size = struct.calcsize('128sl')
                 # 定义文件头信息，包含文件名和文件大小
                 fhead = struct.pack(
-                        '128sl',
-                        os.path.basename(self.filepath).encode(encoding="utf-8"),
-                        os.stat(self.filepath).st_size)
+                    '128sl',
+                    os.path.basename(self.filepath).encode(
+                        encoding="utf-8"),
+                    os.stat(self.filepath).st_size)
                 print('client filepath: {0}'.format(self.filepath))
-                self.conn.sendall(fhead)                    
+                self.conn.sendall(fhead)
                 fp = open(self.filepath, 'rb')
                 while True:
                     data = fp.read(1024)
                     if not data:
-                        self.conn.sendall(bytes(self.sendList + "|" + self.username, "utf-8"))
+                        self.conn.sendall(
+                            bytes(self.sendList + "|" + self.username, "utf-8"))
                         print('file send over...')
                         break
                     self.conn.sendall(data)
@@ -314,9 +355,15 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
     def refresh_interface(self):
         while self.connected:
             message = self.conn.recv(1024)
+            buf = message
             message = message.decode("utf-8")
             print(message)
-            if message != "":
+            try:
+                filename, filesize = struct.unpack('128sl', buf)
+                isFile = True
+            except:
+                isFile = False
+            if message != "" and not isFile:
                 # message type: CLIENTS - update friends list
                 if "{CLIENTS}" in message:
                     newclient = message.split("{CLIENTS}")
@@ -349,6 +396,33 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                     self.messageBrowser.moveCursor(QTextCursor.End)
                     # self.scrollRecords.verticalScrollBar().setValue(
                     #     self.scrollRecords.verticalScrollBar().maximum())
+            elif isFile:
+                try:
+                    fn = filename.strip(b"\x00").decode("utf-8")
+                    new_filename = os.path.join('./download_files/', fn)
+                    print('file new name is {0}, filesize is {1}'.format(
+                        new_filename, filesize))
+                    recvd_size = 0  # 定义已接收文件的大小
+                    fp = open(new_filename, 'wb')
+                    print('start receiving...')
+
+                    while recvd_size < filesize:
+                        if filesize - recvd_size > 1024:
+                            data = self.conn.recv(1024)
+                            recvd_size += len(data)
+                        else:
+                            data = self.conn.recv(filesize - recvd_size)
+                            recvd_size = filesize
+                        fp.write(data)
+                    print("should receive {}, actually receive {}".format(
+                        filesize, recvd_size))
+                    fp.close()
+                    print('end receive...')
+                    # QMessageBox.warning(self, "Warning", "The FILE has been received!", QMessageBox.Ok)
+                except Exception as e:
+                    print(e)
+                    pass
+                    # QMessageBox.warning(self, "Warning", "Error receive the FILE!", QMessageBox.Ok)
             time.sleep(0.1)
 
     def connect_server(self, name, IP, port):
@@ -408,15 +482,21 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         # self
         if type == 1:
             if len(style_base) == 0:
-                msg = messages[0] + style1 + "</head><body>" + "<p><span" + style1 + "\">" + message + " </span></p></body></html>"
+                msg = messages[0] + style1 + "</head><body>" + "<p><span" + \
+                    style1 + "\">" + message + " </span></p></body></html>"
             else:
-                msg = messages[0] + style1 + "</head><body>" + "<p><span" + style1 + style_base[0] + "\">" + message + " </span></p></body></html>"
+                msg = messages[0] + style1 + "</head><body>" + "<p><span" + style1 + \
+                    style_base[0] + "\">" + message + \
+                    " </span></p></body></html>"
         # others
         else:
             if len(style_base) == 0:
-                msg = messages[0] + style2 + "</head><body>" + "<p><span" + style2 + "\">" + message + " </span></p></body></html>"
+                msg = messages[0] + style2 + "</head><body>" + "<p><span" + \
+                    style2 + "\">" + message + " </span></p></body></html>"
             else:
-                msg = messages[0] + style2 + "</head><body>" + "<p><span" + style2 + style_base[0] + "\">" + message + " </span></p></body></html>"
+                msg = messages[0] + style2 + "</head><body>" + "<p><span" + style2 + \
+                    style_base[0] + "\">" + message + \
+                    " </span></p></body></html>"
         return msg
 
     def sendTowhom(self, sendlist):
@@ -445,6 +525,10 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         except IOError:
             QMessageBox.critical(self, "Error", "Save failed!")
             return False
+
+    def downloadFile(self, fileName):
+        msg = bytes("{DOWNLOAD}" + self.username + "|" + fileName, "utf-8")
+        self.conn.sendall(msg)
 
     def isImg(self, str):
         is_img = False
@@ -543,7 +627,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
     def on_clearToolBtn_clicked(self):
 
         self.messageBrowser.clear()
-    
+
     @pyqtSlot()
     def on_sendButton_clicked(self):
 
@@ -581,6 +665,15 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
                 self.send("TEXT")
             else:
                 print("enter")
+        # "CTRL D" => download
+        if (event.key() == Qt.Key_D):
+            fileName, ok = QtWidgets.QInputDialog.getText(
+                self, 'download', 'Please input the file name: ')
+            if ok:
+                self.downloadFile(fileName)
+                event.accept()
+            else:
+                event.ignore()
 
 
 userlists = []

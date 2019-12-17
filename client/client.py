@@ -65,7 +65,8 @@ class ClientWidget(QtWidgets.QWidget, Ui_login):
             signature = users[name][1]
             verify = secret.rsa_signature_decode(password, public_key, signature)
             if verify:
-                IP = "192.168.43.194"
+                # IP = "192.168.43.194"
+                IP = "127.0.0.1"
                 port = 30153
                 if ChatWidget.connect_server(name, IP, port) == True:
                     self.connected = True

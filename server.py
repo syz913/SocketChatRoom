@@ -4,6 +4,7 @@ import os
 import time
 import struct
 
+
 def connecting():
     while True:
         client, client_address = SERVER.accept()
@@ -46,6 +47,30 @@ def receive_message(client):  # Takes client socket as argument.
                 new_msg = message.replace("{ALL}", "{MESSAGE}"+prefix)
                 send_message(new_msg, broadcast=True)
                 continue
+            # download
+            if message.startswith("{DOWNLOAD}"):
+                msg_params = message.split("|")
+                dest_name = msg_params[0][10:]
+                dest_socket = find_client_socket(dest_name)
+                fileName = msg_params[1]
+                filepath = "./server_files/"+fileName
+                print(filepath)
+                if os.path.isfile(filepath):
+                    fhead = struct.pack(
+                        '128sl',
+                        os.path.basename(filepath).encode(
+                            encoding="utf-8"),
+                        os.stat(filepath).st_size)
+                    print('server filepath: {0}'.format(filepath))
+                    dest_socket.sendall(fhead)
+                    fp = open(filepath, 'rb')
+                    while True:
+                        data = fp.read(1024)
+                        if not data:
+                            print('file send over...')
+                            break
+                        dest_socket.sendall(data)
+                continue
             # message type: {LOGOUT}
             if message == "{LOGOUT}":
                 client.close()
@@ -55,7 +80,7 @@ def receive_message(client):  # Takes client socket as argument.
                     pass
                 if name:
                     send_message("{LEFT}%s has left the chat." %
-                                name, broadcast=True)
+                                 name, broadcast=True)
                     # update the chat room
                     send_message("{CLIENTS}" + get_clients(), broadcast=True)
                 break
@@ -66,34 +91,37 @@ def receive_message(client):  # Takes client socket as argument.
             isFile = True
         except:
             isFile = False
-        if not isFile:
+        if not isFile and "{DOWNLOAD}" not in message:
             # private message
             try:
                 msg_params = message.split("}")
                 dest_name = msg_params[0][1:]
                 dest_socket = find_client_socket(dest_name)
-                msg = message.replace("{" + dest_name + "}", "{PRIVATE}"+ prefix)
+                msg = message.replace(
+                    "{" + dest_name + "}", "{PRIVATE}" + prefix)
                 if dest_socket:
                     send_message(
-                        msg, destination = dest_socket)
+                        msg, destination=dest_socket)
                 else:
                     print("Invalid Destination. %s" % dest_name)
             except:
                 print("Error parsing the message: %s" % message)
         # RECEIVE FILE
-        else:
+        elif isFile:
             try:
                 now = int(round(time.time()*1000))
                 fn = filename.strip(b"\x00").decode("utf-8")
                 fn = fn.split(".")
-                new_filename = os.path.join('./server_files/', fn[0]+"-"+str(now)+"."+fn[1])
-                print(new_filename,filesize)
-                print('file new name is {0}, filesize if {1}'.format(new_filename,filesize))
-    
+                new_filename = os.path.join(
+                    './server_files/', fn[0]+"-"+str(now)+"."+fn[1])
+                print(new_filename, filesize)
+                print('file new name is {0}, filesize if {1}'.format(
+                    new_filename, filesize))
+
                 recvd_size = 0  # 定义已接收文件的大小
                 fp = open(new_filename, 'wb')
                 print('start receiving...')
-    
+
                 while recvd_size < filesize:
                     if filesize - recvd_size > 1024:
                         data = client.recv(1024)
@@ -102,7 +130,8 @@ def receive_message(client):  # Takes client socket as argument.
                         data = client.recv(filesize - recvd_size)
                         recvd_size = filesize
                     fp.write(data)
-                print("should receive {}, actually receive {}".format(filesize, recvd_size))
+                print("should receive {}, actually receive {}".format(
+                    filesize, recvd_size))
                 fp.close()
                 print('end receive...')
                 users = client.recv(1024)
@@ -116,19 +145,21 @@ def receive_message(client):  # Takes client socket as argument.
                 else:
                     dest_socket = find_client_socket(sendList)
                     self_socket = find_client_socket(username)
-                    msg = "{PRIVATEFILE}"+ prefix+"<img src=\""+new_filename+"\">"
+                    msg = "{PRIVATEFILE}" + prefix + \
+                        "<img src=\""+new_filename+"\">"
                     if dest_socket:
                         send_message(
-                            msg, destination = self_socket)
+                            msg, destination=self_socket)
                         send_message(
-                            msg, destination = dest_socket)
+                            msg, destination=dest_socket)
                     else:
                         print("Invalid Destination. %s" % dest_name)
             except:
                 print("Error receive the FILE")
 
-def send_message(message, prefix = "", destination = None, broadcast = False):
-    send_msg=bytes(prefix + message, "utf-8")
+
+def send_message(message, prefix="", destination=None, broadcast=False):
+    send_msg = bytes(prefix + message, "utf-8")
     if broadcast:
         for socket in clients:
             socket.send(send_msg)
@@ -137,8 +168,8 @@ def send_message(message, prefix = "", destination = None, broadcast = False):
             destination.send(send_msg)
 
 
-def get_clients(separator = "|"):
-    names=[]
+def get_clients(separator="|"):
+    names = []
     for _, name in clients.items():
         names.append(name)
     return separator.join(names)
@@ -151,24 +182,24 @@ def find_client_socket(des_name):
     return None
 
 
-# HOST='127.0.0.1'
-HOST = "192.168.43.194"
-PORT=30153
-BUFSIZE=1024
-ADDR=(HOST, PORT)
+HOST = '127.0.0.1'
+# HOST = "192.168.43.194"
+PORT = 30153
+BUFSIZE = 1024
+ADDR = (HOST, PORT)
 
 # create TCP socket and bind the socket to the address (HOST, PORT)
-SERVER=socket(AF_INET, SOCK_STREAM)
+SERVER = socket(AF_INET, SOCK_STREAM)
 SERVER.bind(ADDR)
 
-clients={}
-addresses={}
+clients = {}
+addresses = {}
 
 if __name__ == "__main__":
     try:
         SERVER.listen(5)
         print("Server Started at {}:{}".format(HOST, PORT))
-        ACCEPT_THREAD=Thread(target = connecting)
+        ACCEPT_THREAD = Thread(target=connecting)
         ACCEPT_THREAD.start()
         ACCEPT_THREAD.join()
         SERVER.close()
