@@ -106,9 +106,17 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             self.messageBrowser.setTextColor(Qt.blue)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
-            self.messageBrowser.append(" ")
-            self.messageBrowser.append(message)
-            self.messageBrowser.append(" ")
+            fileName = re.findall(".*src=\"(.*)\">", message)[0][15:]
+            self.messageBrowser.setTextColor(Qt.gray)
+            self.messageBrowser.setCurrentFont(QFont("Times New Roman", 8))
+            if self.isImg(fileName):
+                self.messageBrowser.append(" ")
+                self.messageBrowser.append(message)
+                self.messageBrowser.append(" ")
+            else:
+                self.messageBrowser.append("<img src=\"./client/materials/pdf.png\">")
+                self.messageBrowser.append(fileName)
+                self.messageBrowser.append(" ")
         if type == "PRIVATEFILE":
             if username == self.username:
                 self.messageBrowser.setAlignment(Qt.AlignRight)
@@ -118,9 +126,17 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             self.messageBrowser.setTextColor(Qt.red)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[{Private}" + username + "]  " + times)
-            self.messageBrowser.append(" ")
-            self.messageBrowser.append(message)
-            self.messageBrowser.append(" ")
+            fileName = re.findall(".*src=\"(.*)\">", message)[0][15:]
+            self.messageBrowser.setTextColor(Qt.gray)
+            self.messageBrowser.setCurrentFont(QFont("Times New Roman", 8))
+            if self.isImg(fileName):
+                self.messageBrowser.append(" ")
+                self.messageBrowser.append(message)
+                self.messageBrowser.append(" ")
+            else:
+                self.messageBrowser.append("<img src=\"./client/materials/pdf.png\">")
+                self.messageBrowser.append(fileName)
+                self.messageBrowser.append(" ")
         if type == "NEW":
             self.messageBrowser.setAlignment(Qt.AlignCenter)
             self.messageBrowser.setTextColor(Qt.gray)
@@ -167,9 +183,17 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             self.messageBrowser.setTextColor(Qt.blue)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[" + username + "]  " + times)
-            self.messageBrowser.append(" ")
-            self.messageBrowser.append(message)
-            self.messageBrowser.append(" ")
+            fileName = re.findall(".*src=\"(.*)\">", message)[0][15:]
+            self.messageBrowser.setTextColor(Qt.gray)
+            self.messageBrowser.setCurrentFont(QFont("Times New Roman", 8))
+            if self.isImg(fileName):
+                self.messageBrowser.append(" ")
+                self.messageBrowser.append(message)
+                self.messageBrowser.append(" ")
+            else:
+                self.messageBrowser.append("<img src=\"./client/materials/pdf.png\">")
+                self.messageBrowser.append(fileName)
+                self.messageBrowser.append(" ")
         elif type == "PRIVATEFILE":
             if username == self.username:
                 self.messageBrowser.setAlignment(Qt.AlignRight)
@@ -178,9 +202,17 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
             self.messageBrowser.setTextColor(Qt.red)
             self.messageBrowser.setCurrentFont(QFont("Times New Roman", 12))
             self.messageBrowser.append("[{Private}" + username + "]  " + times)
-            self.messageBrowser.append(" ")
-            self.messageBrowser.append(message)
-            self.messageBrowser.append(" ")
+            fileName = re.findall(".*src=\"(.*)\">", message)[0][15:]
+            self.messageBrowser.setTextColor(Qt.gray)
+            self.messageBrowser.setCurrentFont(QFont("Times New Roman", 8))
+            if self.isImg(fileName):
+                self.messageBrowser.append(" ")
+                self.messageBrowser.append(message)
+                self.messageBrowser.append(" ")
+            else:
+                self.messageBrowser.append("<img src=\"./client/materials/pdf.png\">")
+                self.messageBrowser.append(fileName)
+                self.messageBrowser.append(" ")
 
     def send_message(self, type):
         if type == "TEXT":
@@ -413,6 +445,16 @@ class ChatWidget(QtWidgets.QWidget, Ui_chat):
         except IOError:
             QMessageBox.critical(self, "Error", "Save failed!")
             return False
+
+    def isImg(self, str):
+        is_img = False
+        if ".jpg" in str:
+            is_img = True
+        elif ".png" in str:
+            is_img = True
+        elif ".jpeg" in str:
+            is_img = True
+        return is_img
 
     @pyqtSlot(str)
     def on_SizeComboBox_currentIndexChanged(self, p0):

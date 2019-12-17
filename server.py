@@ -151,7 +151,8 @@ def find_client_socket(des_name):
     return None
 
 
-HOST='127.0.0.1'
+# HOST='127.0.0.1'
+HOST = "192.168.43.194"
 PORT=30153
 BUFSIZE=1024
 ADDR=(HOST, PORT)

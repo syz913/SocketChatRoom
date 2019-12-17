@@ -10,13 +10,9 @@
   - [运行方法](#运行方法)
   - [功能简介](#功能简介)
   - [设计思路](#设计思路)
-
 - [协议设计说明](#协议设计)
-
 - [数据库设计](#数据库设计)
-
 - [加密算法简介](#加密算法简介)
-
 - [功能展示](#功能展示)
 - [注册](#注册)
   - [登录](#登录)
@@ -25,8 +21,8 @@
     - [私聊](#私聊)
   - [登出](#登出)
   - [错误处理与问题解决](#错误处理与问题解决)
-  
 - [文件结构](#文件结构)
+- [原理图](#原理图)
 
 ###  任务介绍
 
@@ -89,7 +85,7 @@ python client\client.py
 2.  `{MESSAGE}` 文本消息指令：包括群发消息/系统消息
 3.  `{FILE}` 文件(图片)消息指令：包括群发消息/系统消息
 4.  `{PRIVATE } + username` 私发消息指令 注：`username` 为变量，表示私发对象的用户名
-5.  `{PRIVATEFILE} + username` 私发消息指令
+5.  `{PRIVATEFILE} + username` 私发文件(图片)消息指令
 6.  `{NEW}` 新用户加入聊天室
 7.  `{LEFT`}  用户离开聊天室
 
@@ -146,7 +142,7 @@ CREATE TABLE messages(
 
 ##### 群聊
 
-聊天内容有文本消息和图片消息，其中图片消息先向server发送文件头信息（包括文件大小），然后发送文件数据包。其中Unicode编码的表情包信息可以算做文本信息，就不另算了。
+聊天内容有文本消息和文件消息，其中文件消息先向server发送文件头信息（包括文件大小），然后发送文件数据包。其中文件消息支持任意格式文件的传输，为了更好地显示，尽量使用 `.jpg` 、`.png` 、`.jpeg` 、`.bmp` 格式地图片以及 `.pdf` 格式的文件，其他格式的文件除了界面显示问题，没有区别。
 
 聊天界面会显示历史消息记录，成员的加入情况，右侧显示用户的在线状况，左下方是消息输入框，功能栏可以对字体样式、大小、颜色等进行修改。其中功能栏中的最左边的下拉菜单可以选择群聊或者私聊，默认是 `ALL` 即群聊。对于新登录的用户，服务器发送系统消息-欢迎 ```{MESSAGE} + Welcome username !``` ，对于已登录用户，系统放送系统消息-用户登录提醒 ```{MEAASGE} + username has joined the chat!```  与 用户登录/登出消息```{CLIENTS} + userlist)```，实现好友登录提醒功能。同时，用户登录/登出消息会使得用户界面中朋友列表和发送列表根据 `userlist` 更新。
 
@@ -154,7 +150,7 @@ CREATE TABLE messages(
 
 <img src="C:\Users\syz\AppData\Roaming\Typora\typora-user-images\image-20191212222432973.png">
 
-发送列表选择 `ALL`，输入发送内容，点击 `Send` 或者 `CTRL+ENTER`，通过向服务器端发送消息 ```{ALL} + message```，实现消息发送功能第一阶段。服务器接收并解析这一消息后，向所有用户端发送消息 ```{MESSAGE} + username + : + message``` ，实现消息发送功能第二阶段。用户端接收到消息后，解析，并在消息框中显示。
+发送列表选择 `ALL`，输入发送内容，点击 `Send` 或者 `CTRL+ENTER`，文本信息通过向服务器端发送消息 ```{ALL} + message```，文件信息向服务端发送头部信息和数据包，实现消息发送功能第一阶段。服务器接收并解析这一消息后，向所有用户端发送消息 ```{MESSAGE} + username + : + message``` 和文件，实现消息发送功能第二阶段。用户端接收到消息后，解析，并在消息框中显示。
 
 ##### 私聊
 
@@ -162,9 +158,9 @@ CREATE TABLE messages(
 
 <img src="C:\Users\syz\AppData\Roaming\Typora\typora-user-images\image-20191212223826577.png">
 
-通过向服务器端发送消息 ·```{username} + message``` 与消息 `{self.name} + message`，实现私聊消息发送功能第一阶段，其中后者是为了实现私聊消息在本地显示。服务器接收并解析这一消息后，解析 `username` 与`self.name` 向 `username` 端与 `self.name` 端分别发送消息 `{PRIVATE} + self.name + : + message`，实现私聊消息发送功能第二阶段。用户端接收到消息后，解析，并在消息框中显示。
+通过向服务器端发送消息 ```{username} + message``` 与消息 `{self.name} + message`，实现私聊消息发送功能第一阶段，其中后者是为了实现私聊消息在本地显示。服务器接收并解析这一消息后，解析 `username` 与`self.name` 向 `username` 端与 `self.name` 端分别发送消息 `{PRIVATE} + self.name + : + message` 或 `{PRIVATEFILE} + name + FILEDATA`，实现私聊消息发送功能第二阶段。用户端接收到消息后，解析，并在消息框中显示。
 
-结果如图所示，用户 `syz` 私聊 `hhh`，所以只有 `hhh` 收到消息，而 `gxx` 收不到消息。其中为了进行区分，私聊消息日期和用户名显示为红色。
+结果如图所示，用户 `syz` 私聊 `gxx` ，`hhh` 和 `gxx` 私聊 `syz` ，所以 `syz` 发送的消息只有 `gxx` 收到，而 `hhh` 收不到消息，同样的 `gxx` 收不到 `hhh` 私聊 `syz` 的信息。其中为了进行区分，私聊消息日期和用户名显示为红色。
 
 #### 登出
 
@@ -172,7 +168,7 @@ CREATE TABLE messages(
 
 用户登出前，会向服务器端发送消息 `{LOGOUT}`，服务器接收到该消息后，断开该客户端的链接。服务器接收到用户登出消息之后，会向其他所有用户发送系统消息 `{MESSAGE} + username + has left the chat` 。用户端接收到消息后在消息框中显示用户离开消息，实现用户离开提醒功能。同时更新界面中朋友列表和发送列表。如果发送列表正好选择为该退出用户，则将发送列表设置为默认的ALL，并且把登出用户的状态设置为 `off-line`
 
-其中保存的聊天信息是从html中取出plainText，这里没有把图片取出来，仅仅是取出了文字信息，效果如下：
+其中保存的聊天信息是从html中取出plainText，这里没有把文件(图片)取出来，仅仅是取出了文字信息，效果如下：
 
 <img width="60%" src="C:\Users\syz\AppData\Roaming\Typora\typora-user-images\image-20191210215443750.png">
 
@@ -224,5 +220,6 @@ CREATE TABLE messages(
        └─image # 图片
 ```
 
+### 原理图
 
-
+![image.png-58.5kB](http://static.zybuluo.com/feixuelove1009/xruxy0m1r26yt48330rmoppy/image.png)

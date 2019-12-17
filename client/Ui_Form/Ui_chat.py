@@ -184,6 +184,7 @@ class Ui_chat(object):
             "QPushButton:hover{background-color: rgb(255, 0, 0);border:none;color:rgb(255, 255, 255);}"
         )
         self.sendButton.setGraphicsEffect(op)
+        self.sendButton.setObjectName("sendButton")
         self.horizontalLayout.addWidget(self.sendButton)
         spacerItem1 = QtWidgets.QSpacerItem(
             178, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -231,7 +232,7 @@ class Ui_chat(object):
         self.SizeComboBox.setItemText(11, _translate("Widget", "20"))
         self.SizeComboBox.setItemText(12, _translate("Widget", "21"))
         self.SizeComboBox.setItemText(13, _translate("Widget", "22"))
-        self.imageBtn.setToolTip(_translate("Widget", "表情"))
+        self.imageBtn.setToolTip(_translate("Widget", "文件"))
         self.imageBtn.setText(_translate("Widget", "..."))
         self.boldToolBtn.setToolTip(_translate("Widget", "加粗"))
         self.boldToolBtn.setText(_translate("Widget", "..."))
