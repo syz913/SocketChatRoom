@@ -1,6 +1,6 @@
 # <center>SocketChatRoom</center>
 
-<right>史一哲 17300290027</right>
+<right>史一哲</right>
 
 - [数据库](#数据库)
 
